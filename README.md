@@ -4,7 +4,7 @@ A JS script that manage deode B-10L uplink.
 
 ## Description
 
-This package provides manager for differents objects and manage API call (administration and data push).
+This package provides a function that decodes B-10L LoRaWan uplink.
 
 ## Usage
 
