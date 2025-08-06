@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test decodeUplink</title>
+    <script src="index.js"></script>
+	<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+</head>
+<body>
+    <h1>Décodeur B-10L en ligne</h1>
+    <h2>Exemples de trames</h2>
+	<table>
+		<tr><th>Contenu</th><th>Trame</th></tr>
+		<tr><td>Configuration</td><td>0101</td></tr>
+		<tr><td>Alarm</td><td>112854A28101000800</td></tr>
+		<tr><td>Profil 1</td><td>021100000000000000003735AF2A00000000000C7E0E000000000041C6B900000000063DDFD3000000000000000000000000</td></tr>
+		<tr><td>Profil 1 horodaté</td><td>021125E681DE0000000000BA035D0000000000000CAE0000000000B8AAEC0000000000000F21000000000000000000030011</td></tr>
+		<tr><td>Profil 2</td><td>022125E681DE030103111301131123012311330133114301431153015311630163117301731100000000075BCD153C01A15F</td></tr>
+		<tr><td>Profil 3</td><td>023125E681DE030103111301131123012311330133114301431153015311630163117301731100000000075BCD153C01A15F</td></tr>
+		<tr><td>Profil 4</td><td>02412750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F</td></tr>
+		<tr><td>Profil 5</td><td>025127502644101012341019123410201234102912341030123410391234104012341049123404331234A15F</td></tr>
+		<tr><td>profil 6</td><td>02612750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F</td></tr>
+		<tr><td>Profil 7</td><td>02712750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F</td></tr>
+	</table>
+	<h2>Formulaire</h2>
+    <form id="decodeForm">
+        <label for="hexInput">Trame :</label>
+        <input type="text" id="hexInput" name="hexInput" maxlength="100" size="150" required><br>
+
+        <label for="portInput">Port (entier positif) :</label>
+        <input type="number" id="portInput" name="portInput" min="0" max="255" size="10" required><br>
+
+        <label for="timeInput">Horodatage :</label>
+        <input type="datetime-local" id="timeInput" name="timeInput" required><br>
+
+        &nbsp;&nbsp;<button type="submit">Décoder</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="reset" value="Réinitialiser" onclick="viderResultat()"> <!-- Bouton de réinitialisation -->
+    </form>
+    <h2>Résultat du codec</h2>
+    &nbsp;&nbsp;<button onclick="copierResultat()">Copier le résultat</button> <!-- Bouton pour copier le résultat -->
+    <div id="resultBlockDiv"><pre><code id="resultBlock"></code></pre></div> <!-- Bloc pour afficher le résultat -->
+    &nbsp;&nbsp;<button onclick="copierResultat()">Copier le résultat</button> <!-- Bouton pour copier le résultat -->
+    <script>
+        function hexStringToByteArray(hexString) {
+            // Vérifiez que la chaîne hexadécimale a une longueur paire
+            if (hexString.length % 2 !== 0) {
+                throw new Error("La chaîne hexadécimale doit avoir une longueur paire.");
+            }
+
+            // Convertissez chaque paire de caractères hexadécimaux en un octet
+            const byteArray = [];
+            for (let i = 0; i < hexString.length; i += 2) {
+                const byte = parseInt(hexString.substr(i, 2), 16);
+                byteArray.push(byte);
+            }
+
+            return byteArray;
+        }
+    </script>
+    <script>
+        // Récupérez l'élément d'horodatage
+        var timeInput = document.getElementById("timeInput");
+        // Obtenez l'heure actuelle au format ISO (par exemple, "2024-03-11T21:59:00")
+        var now = new Date().toISOString().slice(0, 16); // Supprimez les secondes et la zone horaire
+        // Définissez la valeur par défaut de l'horodatage sur l'heure actuelle
+        timeInput.value = now;
+
+        // Valeur du port par défaut
+        portInput.value = 2;
+
+        document.getElementById("decodeForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+
+            // Récupérez les valeurs saisies par l'utilisateur
+            var hexValue = document.getElementById("hexInput").value;
+            var portValue = parseInt(document.getElementById("portInput").value);
+            var timeValue = document.getElementById("timeInput").value;
+
+            // Votre appel à la fonction decodeUplink ici
+            var input = {
+                bytes: hexStringToByteArray(hexValue),
+                fPort: portValue,
+                recvTime: timeValue
+            };
+
+            var result = decodeUplink(input);
+
+            // Affichez le résultat dans le bloc dédié
+            var resultBlock = document.getElementById("resultBlock");
+            resultBlock.textContent = JSON.stringify(result, null, 2); // Formatage JSON
+
+            console.log(result); // Affiche le résultat dans la console
+        });
+
+        function copierResultat() {
+            var resultat = document.getElementById("resultBlock").textContent;
+            navigator.clipboard.writeText(resultat)
+                .then(function() {
+                    alert("Résultat copié dans le presse-papier !");
+                })
+                .catch(function(err) {
+                    console.error("Erreur lors de la copie : ", err);
+                });
+        }
+
+        function viderResultat() {
+            document.getElementById("resultBlock").textContent = "";
+        }
+    </script>
+</body>
+</html>

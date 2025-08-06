@@ -1,0 +1,49 @@
+import { decodeUplink } from "./index.js";
+
+console.log("Hello world!");
+
+function hexStringToByteArray(hexString) {
+    // Vérifiez que la chaîne hexadécimale a une longueur paire
+    if (hexString.length % 2 !== 0) {
+        throw new Error("La chaîne hexadécimale doit avoir une longueur paire.");
+    }
+
+    // Convertissez chaque paire de caractères hexadécimaux en un octet
+    const byteArray = [];
+    for (let i = 0; i < hexString.length; i += 2) {
+        const byte = parseInt(hexString.substr(i, 2), 16);
+        byteArray.push(byte);
+    }
+
+    return byteArray;
+}
+
+var  input = {
+    bytes: hexStringToByteArray("112854A28101000800"),
+    fPort: 2,
+    recvTime: "2020-08-02T20:00:00.000+02:00"
+}
+
+var result = decodeUplink(input)
+
+
+//console.log(result)
+console.log(JSON.stringify(result))
+
+
+// 021125E681DE0000000000BA035D0000000000000CAE0000000000B8AAEC0000000000000F21000000000000000000030011 Profil 1 horodaté
+
+// 021100000000000000003735AF2A00000000000C7E0E000000000041C6B900000000063DDFD3000000000000000000000000") //Profil 1
+
+// 112854A28101000800 Alarm
+// 0101 configuration
+// 021100000000000027046F42C800000026EF7AD79CF0000026D5DE54F800000026BED8184170000000000000000000040100 //Profil 1
+// 0211000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 //Profil 1
+// 022125E681DE030103111301131123012311330133114301431153015311630163117301731100000000075BCD153C01A15F //Profil 2
+// 023125E681DE030103111301131123012311330133114301431153015311630163117301731100000000075BCD153C01A15F //Profil 3
+// 02412750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F //Profil 4
+// 0241000000007fffffff7fffffffffffffff7fff0000ffffffffffffffffffffffffffffffff1c007f167fff04501234A15F
+// 025127502644101012341019123410201234102912341030123410391234104012341049123404331234A15F //Profil 5
+// 02612750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F //profil 6
+// 0261000e3ae400000eb40000000000000000000002280003ffffffffffffffffffffffffffffffffffffffffffff1c00A15F
+// 02712750264400000fb6fffffd9200000fe603dc0001000006770000120c000032980000c3511C007fff7fff04331234A15F //Profil 7
